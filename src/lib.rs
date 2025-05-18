@@ -1,18 +1,25 @@
+use clap::Parser;
 use std::collections::HashMap;
 use std::error::Error;
 use std::fs;
 
-pub struct Config {
+#[derive(Parser, Debug)]
+#[command(version, about, long_about = None)]
+pub struct Args {
+    #[arg(short, long, default_value = "translations.txt")]
     pub filename: String,
+    #[arg(short, long, default_value = "=")]
     pub separator: char,
+    #[arg(short, long, default_value = "english")]
     pub lang: String,
+    #[arg(short, long)]
     pub translation: String,
 }
 
 const DEFAULT_SEPARATOR: char = '=';
 
-impl Config {
-    pub fn new(mut args: std::env::Args) -> Result<Config, &'static str> {
+impl Args {
+    pub fn new(mut args: std::env::Args) -> Result<Args, &'static str> {
         args.next();
 
         let filename = match args.next() {
@@ -41,7 +48,7 @@ impl Config {
             None => DEFAULT_SEPARATOR,
         };
 
-        Ok(Config {
+        Ok(Args {
             filename,
             separator,
             lang: lang.to_string(),
@@ -50,40 +57,40 @@ impl Config {
     }
 }
 
-pub fn run(config: Config) -> Result<(), Box<dyn Error>> {
-    let contents = fs::read_to_string(&config.filename)?;
+pub fn run(args: Args) -> Result<(), Box<dyn Error>> {
+    let contents = fs::read_to_string(&args.filename)?;
 
     for line in contents.lines() {
-        if !line.contains(config.separator) {
+        if !line.contains(args.separator) {
             return Err(format!("line {} does not contain a valid separator", line).into());
         }
     }
 
-    let result = load(&config, &contents);
+    let result = load(&args, &contents);
 
-    play(&config, result);
+    play(&args, result);
 
     Ok(())
 }
 
-pub fn load<'a>(config: &Config, contents: &'a str) -> HashMap<&'a str, &'a str> {
+pub fn load<'a>(args: &Args, contents: &'a str) -> HashMap<&'a str, &'a str> {
     let mut hm: HashMap<&str, &str> = HashMap::new();
 
     for line in contents.lines() {
-        let v: Vec<&str> = line.split(config.separator).collect();
+        let v: Vec<&str> = line.split(args.separator).collect();
         hm.insert(v[0], v[1]);
     }
 
     hm
 }
 
-pub fn play(config: &Config, map: HashMap<&str, &str>) {
-    println!("Play {} to {}:", config.lang, config.translation);
+pub fn play(args: &Args, map: HashMap<&str, &str>) {
+    println!("Play {} to {}:", args.lang, args.translation);
     for (k, v) in map.iter() {
         println!("{}:{}", k, v);
     }
 
-    println!("\nPlay {} to {}:", config.translation, config.lang);
+    println!("\nPlay {} to {}:", args.translation, args.lang);
     for (k, v) in map.iter() {
         println!("{}:{}", v, k);
     }

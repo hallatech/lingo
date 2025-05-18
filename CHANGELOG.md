@@ -1,3 +1,8 @@
+0.2.0
+
+* Replace basic arg collection with clap crate
+* Rename CLI config struct to args
+
 0.1.0
 
 * Dead simple base version, does nothing useful

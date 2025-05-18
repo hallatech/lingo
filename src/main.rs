@@ -1,14 +1,12 @@
-use lingo::Config;
+use clap::Parser;
+use lingo::Args;
 use std::env;
 use std::process;
 
 fn main() {
-    let config = Config::new(env::args()).unwrap_or_else(|err| {
-        eprintln!("Error passing arguments: {}", err);
-        process::exit(1);
-    });
+    let args = Args::parse();
 
-    if let Err(e) = lingo::run(config) {
+    if let Err(e) = lingo::run(args) {
         eprintln!("Application error: {}", e);
         process::exit(1);
     }
