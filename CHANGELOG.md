@@ -1,3 +1,7 @@
+0.2.1
+
+* Basic translation guessing game
+
 0.2.0
 
 * Replace basic arg collection with clap crate
