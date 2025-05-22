@@ -8,51 +8,16 @@ pub struct Args {
     pub filename: String,
     #[arg(short, long, default_value = "=")]
     pub separator: char,
-    #[arg(short, long, default_value = "english")]
+    #[arg(short, long, default_value = "Nederlands")]
     pub lang: String,
-    #[arg(short, long)]
+    #[arg(short, long, default_value = "French")]
     pub translation: String,
-}
-
-const DEFAULT_SEPARATOR: char = '=';
-
-impl Args {
-    pub fn new(mut args: std::env::Args) -> Result<Args, &'static str> {
-        args.next();
-
-        let filename = match args.next() {
-            Some(arg) => arg,
-            None => return Err("No input filename given"),
-        };
-
-        let latr = match args.next() {
-            Some(arg) => {
-                if !arg.contains(':') {
-                    return Err("language:translation pairing must contain the ':' separator");
-                }
-                arg
-            }
-            None => return Err("language:translation pairing required, e.g. english:french"),
-        };
-        let (lang, translation) = latr.split_once(':').unwrap();
-
-        let separator = match args.next() {
-            Some(arg) => {
-                if arg.len() != 1 {
-                    return Err("Invalid separator, length must be 1");
-                }
-                arg.chars().nth(0).unwrap()
-            }
-            None => DEFAULT_SEPARATOR,
-        };
-
-        Ok(Args {
-            filename,
-            separator,
-            lang: lang.to_string(),
-            translation: translation.to_string(),
-        })
-    }
+    #[arg(short = 'k', long)]
+    pub values_to_keys: bool,
+    #[arg(short, long, default_value_t = 10)]
+    pub attempts: u16,
+    #[arg(short = 'v', long, default_value_t = false)]
+    pub verbose: bool,
 }
 
 pub fn load<'a>(args: &Args, contents: &'a str) -> HashMap<&'a str, &'a str> {
@@ -60,7 +25,11 @@ pub fn load<'a>(args: &Args, contents: &'a str) -> HashMap<&'a str, &'a str> {
 
     for line in contents.lines() {
         let v: Vec<&str> = line.split(args.separator).collect();
-        hm.insert(v[0], v[1]);
+        if args.values_to_keys {
+            hm.insert(v[1], v[0]);
+        } else {
+            hm.insert(v[0], v[1]);
+        }
     }
 
     hm

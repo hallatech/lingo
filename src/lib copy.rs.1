@@ -1,7 +1,9 @@
+// use dialoguer::Input;
 use std::collections::HashMap;
 use std::error::Error;
 use std::fs;
 use std::io;
+// use std::io::Write;
 
 mod config;
 pub use crate::config::*;
@@ -52,6 +54,12 @@ pub fn random_play(args: &Args, map: HashMap<&str, &str>) {
             .read_line(&mut guess)
             .expect("Failed to input line");
 
+        // let prompt = format!("{:?} - Translate: {}", i, rk);
+        // let guess: String = Input::new()
+        //     .with_prompt(prompt)
+        //     .interact_text()
+        //     .unwrap();
+
         attempts += 1;
 
         if args.verbose {
@@ -59,14 +67,28 @@ pub fn random_play(args: &Args, map: HashMap<&str, &str>) {
                 "Checking translation: required:[{}] entered:[{}]",
                 *map.get(rk).unwrap(),
                 guess.trim()
+                // guess
             );
         }
 
         if guess.trim() == *map.get(rk).unwrap() {
-            println!("Yes! You got it right. {}", YES);
+        // if guess == *map.get(rk).unwrap() {
+            if args.verbose {
+                println!("Yes! You got it right. {}", YES);
+            } 
+            // else {
+            //     print!("{}", YES);
+            //     io::stdout().flush().unwrap();
+            // }
             correct += 1;
         } else {
-            println!("Sorry, not quite right. {}", NO);
+            if args.verbose {
+                println!("Sorry, not quite right. {}", NO);
+            } 
+            // else {
+            //     print!("{}", NO);
+            //     io::stdout().flush().unwrap();
+            // }
         }
     }
 
