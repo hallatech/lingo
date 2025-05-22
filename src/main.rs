@@ -1,13 +1,16 @@
 use clap::Parser;
 use lingo::Args;
-use std::env;
+use log::{debug, error};
 use std::process;
 
 fn main() {
+    env_logger::init();
     let args = Args::parse();
 
+    debug!("Args:{:?}", args);
+
     if let Err(e) = lingo::run(args) {
-        eprintln!("Application error: {}", e);
+        error!("Application error: {}", e);
         process::exit(1);
     }
 }
